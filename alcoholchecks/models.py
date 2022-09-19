@@ -21,7 +21,7 @@ class Info(models.Model):
     month = models.ForeignKey(Month, on_delete=models.CASCADE, null=True)
     date_added = models.DateTimeField(auto_now_add=True, null=True)
     CHOICES = (
-        ("アルコール検知なし", "あり"),
+        ("アルコール検知あり", "あり"),
         ("アルコール検知なし", "なし")
         )
     alcohol = models.CharField(choices=CHOICES, max_length=20,null=True)
