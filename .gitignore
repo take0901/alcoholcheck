@@ -1,0 +1,3 @@
+alcoholvenv/
+__pycache__/
+*.sqlite3

@@ -1,0 +1,19 @@
+{% extends 'alcoholchecks/base.html' %}
+
+{% block page_header %}
+  <h3>月ごとの記録</h3>
+  <p><a href="{% url 'alcoholchecks:new_month' user_id %}">新しい月を追加</a></p>
+{% endblock page_header %}
+
+{% block content%}
+  <ul>
+    {% for month in monthes %}
+      <li><h3>
+        <a href="{% url 'alcoholchecks:month' month.id %}">{{ month }}</a>
+      </h3></li>
+    {% empty %}
+      <li><h3>まだ記録はありません</h3></li>
+    {% endfor %}
+  </ul>
+
+{% endblock content %}

@@ -1,0 +1,22 @@
+{% extends 'alcoholchecks/base.html' %}
+
+{% block page_header %}
+  <h3>{{ month }}</h3>
+  <p><a href="{% url 'alcoholchecks:new_info' month.id %}">記録を追加</a></p>
+{% endblock page_header %}
+
+{% block content %}
+  {% for info in infos %}
+    <div class="card mb-3">
+        <h4 class="card-header">
+            {{ info.date_added|date:'Y年m月d日 H:i' }}
+        </h4>
+        <div class="card-body">
+            {{ info.alcohol }}
+        </div>
+    </div>
+    {% empty %}
+      <p>まだこの月には記録はありません</p>
+    {% endfor %}
+
+{% endblock content %}
