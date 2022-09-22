@@ -24,7 +24,12 @@ class Info(models.Model):
         ("アルコール検知あり", "あり"),
         ("アルコール検知なし", "なし")
         )
+    carnumbers = (
+        ("6882", "6882"), ("2151", "2151"), ("2532", "2532"), ("5173", "5173"), ("5999", "5999"),
+        ("386", "386"), ("783", "783"), ("2569", "2569"), ("777", "777"), ("3080", "3080")
+    )
     alcohol = models.CharField(choices=CHOICES, max_length=20,null=True)
+    carnumber = models.CharField(choices=carnumbers, max_length=20, null=True)
 
     def __str__(self):
         return self.alcohol

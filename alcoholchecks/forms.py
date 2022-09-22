@@ -10,5 +10,5 @@ class MonthForm(forms.ModelForm):
 class InfoForm(forms.ModelForm):
     class Meta:
         model = Info
-        fields = ['alcohol']
-        labels = {'alcohol':""}
+        fields = ['alcohol', 'carnumber']
+        labels = {'alcohol':"アルコール検知の有無", 'carnumber':"車両ナンバー"}
