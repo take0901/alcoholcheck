@@ -71,6 +71,7 @@ def new_info(request, month_id):
     context = {'month':month, 'form':form}
     return render(request, 'alcoholchecks/new_info.html', context)
 
+@login_required
 def check(request):
     if str(request.user) != "alcohol_admin":
         raise Http404
