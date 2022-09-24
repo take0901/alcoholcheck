@@ -133,5 +133,4 @@ if os.environ.get('DEBUG') == 'TRUE':
 elif os.environ.get('DEBUG') == 'FALSE':
     DEBUG = False
 
-SESSION_COOKIE_AGE = 60 * 5
-SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_AGE = 60 * 15
