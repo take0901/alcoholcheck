@@ -15,7 +15,7 @@ def monthes(request, user_id):
     if request.user != user and str(request.user) != "alcohol_admin":
         raise Http404
     monthes = user.month_set.all()
-    context = {'monthes':monthes, 'user_id':user_id}
+    context = {'monthes':monthes, 'user':user}
     return render(request, 'alcoholchecks/monthes.html', context)
 
 @login_required
@@ -31,7 +31,7 @@ def month(request, month_id):
 def new_month(request, user_id):
     '''新しい月を追加する'''
     user = User.objects.get(id=user_id)
-    if user != request.user:
+    if user != request.user and str(request.user)!="alcohol_admin":
         raise Http404
     if request.method != 'POST':
         #空のフォーム
@@ -51,9 +51,9 @@ def new_month(request, user_id):
 @login_required
 def new_info(request, month_id):
     month = Month.objects.get(id=month_id)
-    if month.owner != request.user:
+    if month.owner != request.user and str(request.user) != "alcohol_admin":
         raise Http404
-
+        
     if request.method != 'POST':
         #フォームを生成
         form = InfoForm()
@@ -63,7 +63,7 @@ def new_info(request, month_id):
         if form.is_valid():
             new_info = form.save(commit=False)
             new_info.month = month
-            new_info.owner = request.user
+            new_info.owner = month.owner
             new_info.save()
             return redirect('alcoholchecks:month', month_id=month_id)
 
