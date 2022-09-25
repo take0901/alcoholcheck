@@ -21,8 +21,9 @@ class Info(models.Model):
     month = models.ForeignKey(Month, on_delete=models.CASCADE, null=True)
     date_added = models.DateTimeField(auto_now_add=True, null=True)
     CHOICES = (
-        ("アルコール検知あり", "あり"),
-        ("アルコール検知なし", "なし")
+        ("アルコール検知: 0.00mg", "0.00mg"),
+        ("アルコール検知: 0.15mg未満", "0.15mg未満"),
+        ("アルコール検知: 0.15mg以上", "0.15mg以上")
         )
     carnumbers = (
         ("6882", "6882"), ("2151", "2151"), ("2532", "2532"), ("5173", "5173"), ("5999", "5999"),
