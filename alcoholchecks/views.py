@@ -83,7 +83,7 @@ def check(request):
 def delete_month(request, month_id):
     #月を削除する
     month = get_object_or_404(Month, id=month_id)
-    if str(month.owner) != "alcohol_admin":
+    if str(request.user) != "alcohol_admin":
         raise Http404
     
     if request.method == "POST":
@@ -98,7 +98,7 @@ def delete_info(request, info_id):
     #記録を削除
     info = get_object_or_404(Info, id=info_id)
     month = info.month
-    if str(month.owner) != "alcohol_admin":
+    if str(request.user) != "alcohol_admin":
         raise Http404
 
     if request.method == 'POST':
