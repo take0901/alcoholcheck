@@ -17,4 +17,8 @@ urlpatterns = [
     path('new_info/<int:month_id>/', views.new_info, name="new_info"),
     #スーパーユーザーのみアクセルできる確認画面
     path('check/', views.check, name="check"),
+    #月を削除
+    path('delete_month/<int:month_id>/', views.delete_month, name="delete_month"),
+    #記録を削除
+    path('delete_info/<int:info_id>/', views.delete_info, name="delete_info"),
 ]

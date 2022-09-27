@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404
-from .models import Month
+from .models import Month, Info
 from .forms import MonthForm, InfoForm
 
 def index(request):
@@ -78,3 +78,32 @@ def check(request):
     users = User.objects.all()
     context = {'users':users}
     return render(request, 'alcoholchecks/check.html', context)
+
+@login_required
+def delete_month(request, month_id):
+    #月を削除する
+    month = get_object_or_404(Month, id=month_id)
+    if str(month.owner) != "alcohol_admin":
+        raise Http404
+    
+    if request.method == "POST":
+        month.delete()
+        return redirect('alcoholchecks:monthes', user_id=month.owner.id)
+
+    context = {'month':month}
+    return render(request, 'alcoholchecks/delete_month.html', context)
+
+@login_required
+def delete_info(request, info_id):
+    #記録を削除
+    info = get_object_or_404(Info, id=info_id)
+    month = info.month
+    if str(month.owner) != "alcohol_admin":
+        raise Http404
+
+    if request.method == 'POST':
+        info.delete()
+        return redirect('alcoholchecks:month', month_id=month.id)
+
+    context = {'month':month, 'info':info}
+    return render(request, 'alcoholchecks/delete_info.html', context)

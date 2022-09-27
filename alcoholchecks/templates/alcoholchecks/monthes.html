@@ -10,6 +10,7 @@
     {% for month in monthes %}
       <li><h3>
         <a href="{% url 'alcoholchecks:month' month.id %}">{{ month }}</a>
+        <a href="{% url 'alcoholchecks:delete_month' month.id %}">削除</a>
       </h3></li>
     {% empty %}
       <li><h3>まだ記録はありません</h3></li>

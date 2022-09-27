@@ -1,0 +1,22 @@
+{% extends 'alcoholchecks/base.html' %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h2>記録を削除する</h2>
+{% endblock page_header %}
+
+{% block content %}
+  <p>
+    <a href="{% url 'alcoholchecks:month' month.id %}">{{ month }}</a>
+  </p>
+
+  <p>{{ info.alcohol }} {{ info.date_added|date:'Y年m月d日 H:i' }} 車両ナンバー:{{ info.carnumber }}</p>
+  
+  <form action="{% url 'alcoholchecks:delete_info' info.id %}" method="post">
+    {% csrf_token %}
+    {% buttons %}
+      <button name="submit" class="btn btn-primary">記録を削除</button>
+    {% endbuttons %}
+  </form>
+
+{% endblock content %}
