@@ -12,19 +12,25 @@ def index(request):
 @login_required
 def monthes(request, user_id):
     user = User.objects.get(id=user_id)
+    delete = ""
     if request.user != user and str(request.user) != "alcohol_admin":
         raise Http404
+    if str(request.user) == "alcohol_admin":
+        delete = "削除"
     monthes = user.month_set.all()
-    context = {'monthes':monthes, 'user':user}
+    context = {'monthes':monthes, 'user':user, 'delete':delete}
     return render(request, 'alcoholchecks/monthes.html', context)
 
 @login_required
 def month(request, month_id):
     month = Month.objects.get(id=month_id)
+    delete = ""
     if month.owner != request.user and str(request.user) != "alcohol_admin":
         raise Http404
+    if str(request.user) == "alcohol_admin":
+        delete = "削除"
     infos = month.info_set.order_by('-date_added')
-    context = {'month':month, 'infos':infos}
+    context = {'month':month, 'infos':infos, 'delete':delete}
     return render(request, 'alcoholchecks/month.html', context)
 
 @login_required
