@@ -4,4 +4,7 @@
   <div class="jumbotron">
     <h1 class="display-3">アルコールチェックの記録</h1>
   </div>
+  <p>
+    <a href="{% url 'alcoholchecks:check' %}">{{ check }}</a>
+  </p>
 {% endblock page_header %}

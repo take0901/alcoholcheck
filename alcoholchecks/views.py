@@ -9,7 +9,11 @@ import csv
 
 def index(request):
     '''ホームページ'''
-    return render(request, 'alcoholchecks/index.html')
+    check = ""
+    if str(request.user) == "alcohol_admin":
+        check = "チェックする"
+    context = {'check':check}
+    return render(request, 'alcoholchecks/index.html', context)
 
 @login_required
 def monthes(request, user_id):
