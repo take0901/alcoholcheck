@@ -1,9 +1,11 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404
 from .models import Month, Info
 from .forms import MonthForm, InfoForm
+import csv
 
 def index(request):
     '''ホームページ'''
@@ -113,3 +115,21 @@ def delete_info(request, info_id):
 
     context = {'month':month, 'info':info}
     return render(request, 'alcoholchecks/delete_info.html', context)
+
+@login_required
+def download(request, user_id):
+     
+    user = User.objects.get(id=user_id)
+    monthes = Month.objects.filter(owner=user)
+    response = HttpResponse(content_type="text/csv; charset=Shift-JIS")
+    response['Content-Disposition'] = 'attachment;  filename="{}_data.csv"'.format(user)
+    writer = csv.writer(response)
+    infolist = []
+    for month in monthes:
+        infos = month.info_set.all()
+        infolist.extend(infos)
+    
+    for info in infolist:
+        writer.writerow([info.date_added.strftime('%Y/%m/%d %H:%M')
+        ,info.carnumber,info.alcohol,"武村義治"])
+    return response
