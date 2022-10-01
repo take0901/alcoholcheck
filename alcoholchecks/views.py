@@ -6,6 +6,7 @@ from django.http import Http404
 from .models import Month, Info
 from .forms import MonthForm, InfoForm
 import csv
+import datetime
 
 def index(request):
     '''ホームページ'''
@@ -134,6 +135,7 @@ def download(request, user_id):
         infolist.extend(infos)
     
     for info in infolist:
+        info.date_added += datetime.timedelta(hours=9)
         writer.writerow([info.date_added.strftime('%Y/%m/%d %H:%M')
         ,info.carnumber,info.alcohol,"武村義治"])
     return response
