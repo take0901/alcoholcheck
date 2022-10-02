@@ -7,6 +7,7 @@ from .models import Month, Info
 from .forms import MonthForm, InfoForm
 import csv
 import datetime
+from re import sub
 
 def index(request):
     '''ホームページ'''
@@ -20,12 +21,14 @@ def index(request):
 def monthes(request, user_id):
     user = User.objects.get(id=user_id)
     delete = ""
+    download = ""
     if request.user != user and str(request.user) != "alcohol_admin":
         raise Http404
     if str(request.user) == "alcohol_admin":
         delete = "削除"
+        download = "ダウンロード"
     monthes = user.month_set.all()
-    context = {'monthes':monthes, 'user':user, 'delete':delete}
+    context = {'monthes':monthes, 'user':user, 'delete':delete, 'download':download}
     return render(request, 'alcoholchecks/monthes.html', context)
 
 @login_required
@@ -122,19 +125,15 @@ def delete_info(request, info_id):
     return render(request, 'alcoholchecks/delete_info.html', context)
 
 @login_required
-def download(request, user_id):
-     
-    user = User.objects.get(id=user_id)
-    monthes = Month.objects.filter(owner=user)
+def download(request, month_id):
+    month = Month.objects.get(id=month_id)
+    mon = sub(r"\D", "", month.month)
+    user = month.owner
     response = HttpResponse(content_type="text/csv; charset=Shift-JIS")
-    response['Content-Disposition'] = 'attachment;  filename="{}_data.csv"'.format(user)
+    response['Content-Disposition'] = 'attachment;  filename="{}_{}_data.csv"'.format(user, mon)
     writer = csv.writer(response)
-    infolist = []
-    for month in monthes:
-        infos = month.info_set.all()
-        infolist.extend(infos)
-    
-    for info in infolist:
+    infos = month.info_set.all()
+    for info in infos:
         info.date_added += datetime.timedelta(hours=9)
         writer.writerow([info.date_added.strftime('%Y/%m/%d %H:%M')
         ,info.carnumber,info.alcohol,"武村義治"])

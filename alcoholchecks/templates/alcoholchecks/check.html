@@ -9,7 +9,6 @@
     {% for user in users %}
       <li><h3>
         <a href="{% url 'alcoholchecks:monthes' user.id %}">{{ user }}</a>
-        <a href="{% url 'alcoholchecks:download' user.id %}">ダウンロード</a>
       </h3></li>
       {% empty %}
       <li><p>まだユーザーはいません</p></li>

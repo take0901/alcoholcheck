@@ -22,5 +22,5 @@ urlpatterns = [
     #記録を削除
     path('delete_info/<int:info_id>/', views.delete_info, name="delete_info"),
     #ダウンロード
-    path('download/<int:user_id>/', views.download, name="download"),
+    path('download/<int:month_id>/', views.download, name="download"),
 ]
