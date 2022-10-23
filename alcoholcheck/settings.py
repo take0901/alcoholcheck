@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     #自分のアプリ
     "alcoholchecks",
     "users",
+    'informations',
     #bootstrap
     "bootstrap4",
     "django.contrib.admin",

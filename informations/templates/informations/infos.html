@@ -1,0 +1,60 @@
+{% extends 'informations/base.html' %}
+
+{% block page_header %}
+<h3>記録の一覧</h3>
+{% endblock page_header %}
+
+{% block content %}
+<form action="{% url 'informations:infos' %}" method="post">
+  {% csrf_token %}
+  <h2>絞り込み</h2>
+  <select name="year">
+    <option value="all">すべて</option>
+    {% for year in years %}
+    <option value="{{year}}">{{year}}年</option>
+    {% endfor %}
+  </select>
+  <select name="month">
+    <option value="all2">すべて</option>
+    {% for month in months %}
+    <option value="{{month}}">{{month}}月</option>
+    {% endfor %}
+  </select>
+  <select name="motouke">
+    <option value="all3">すべて</option>
+    {% for motouke in motoukes %}
+    <option value="{{motouke}}">{{motouke}}</option>
+    {% endfor %}
+  </select>
+  <input type="submit" name="button" value="更新">
+  </form>
+
+<p>
+  <a href="{% url 'informations:new_info' %}">新しい記録を追加</a>
+</p>
+  <table border="1" bgcolor="lightyellow" width="100%" cellpadding="10">
+    <tr>
+        <th>年</th>
+        <th>月</th>
+        <th>元請名</th>
+        <th>工事名</th>
+        <th>場所</th>
+        <th>色番号</th>
+        <th>備考</th>
+        <th></th>
+      </tr>
+    {% for info in infos %}
+      <tr>
+        <td>{{info.year}}</td>
+        <td>{{info.month}}</td>
+        <td>{{info.motouke}}</td>
+        <td>{{info.kouzi}}</td>
+        <td>{{info.place}}</td>
+        <td>{{info.color_number}}</td>
+        <td>{{info.other}}</td>
+        <td><a href="{% url 'informations:edit_info' info.id %}">編集</a></td>
+      </tr>
+    {% endfor %}
+    </table>
+
+{% endblock content %}
