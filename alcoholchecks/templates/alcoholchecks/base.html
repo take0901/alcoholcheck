@@ -39,9 +39,6 @@
             <a class="nav-link" href="{% url 'users:logout' %}">ログアウト</a>
           </li>
         {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'users:register'%}">ユーザー登録</a>
-          </li>
           <a class="nav-link" href="{% url 'users:login' %}">ログイン</a></li>
         {% endif %}
       </ul>
