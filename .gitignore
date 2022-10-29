@@ -1,3 +1,4 @@
 alcoholvenv/
 __pycache__/
 *.sqlite3
+local_settings.py

@@ -21,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-k^9er22-ya2+9@%@^5n&e$p=qf=0)w#&g#c_vmni$+nom3^_9o"
+#SECRET_KEY = "django-insecure-k^9er22-ya2+9@%@^5n&e$p=qf=0)w#&g#c_vmni$+nom3^_9o"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -125,13 +125,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_URL = 'users:login'
 
-#Heroku の設定
-import django_heroku
-django_heroku.settings(locals())
-
-if os.environ.get('DEBUG') == 'TRUE':
-    DEBUG = True
-elif os.environ.get('DEBUG') == 'FALSE':
-    DEBUG = False
+try:
+    from .local_settings import *
+except ImportError:
+    pass
+if not DEBUG:
+    #Heroku の設定
+    import django_heroku
+    django_heroku.settings(locals())
+    SECRET_KEY = os.environ['SECRET_KEY']
 
 SESSION_COOKIE_AGE = 60 * 15
