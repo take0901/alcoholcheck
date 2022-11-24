@@ -8,6 +8,10 @@ from .forms import MonthForm, InfoForm
 import csv
 import datetime
 from re import sub
+import io
+import xlsxwriter
+import openpyxl
+from openpyxl.writer.excel import save_virtual_workbook
 
 def index(request):
     '''ホームページ'''
@@ -125,16 +129,47 @@ def delete_info(request, info_id):
     return render(request, 'alcoholchecks/delete_info.html', context)
 
 @login_required
-def download(request, month_id):
+def excel_download(request, month_id):
     month = Month.objects.get(id=month_id)
     mon = sub(r"\D", "", month.month)
-    user = month.owner
-    response = HttpResponse(content_type="text/csv; charset=Shift-JIS")
-    response['Content-Disposition'] = 'attachment;  filename="{}_{}_data.csv"'.format(user, mon)
-    writer = csv.writer(response)
+    user = request.user
+    output = io.BytesIO()
+    book = xlsxwriter.Workbook(output)
+    ws = book.add_worksheet('test')
+    filename = "{}_{}_data.xlsx".format(str(user), mon)
+    header = ["日時", "車両ナンバー", "アルコール検知", "確認者"]
+    for i, j in enumerate(header):
+        ws.write(3, i, j)
     infos = month.info_set.all()
-    for info in infos:
+    for index,info in enumerate(infos):
         info.date_added += datetime.timedelta(hours=9)
-        writer.writerow([info.date_added.strftime('%Y/%m/%d %H:%M')
-        ,info.carnumber,info.alcohol,"武村義治"])
+        ws.write(index+4, 0, info.date_added.strftime('%Y/%m/%d %H:%M'))
+        ws.write(index+4, 1, int(info.carnumber))
+        ws.write(index+4, 2, info.alcohol)
+        ws.write(index+4, 3, "武村義治")
+    book.close()
+    output.seek(0)
+    wb = openpyxl.load_workbook(output)
+    sheet = wb.worksheets[0]
+    sheet.title = f"{mon}月"
+
+    #columnの数繰り返す
+    for col in sheet.columns:
+        max_length = 0#一番文字数が多い文字列の文字数
+        column = col[0].column_letter
+
+        for cell in col:#一番文字数が多い文字の文字数をmax_lengthにいれる
+            if len(str(cell.value)) > max_length:#文字数よりmax_lengthが多かったらmax_lengthを更新
+                max_length = len(str(cell.value))
+    
+        sheet.column_dimensions[column].width = (max_length+2) *2
+    sheet.merge_cells('A1:D3')
+    sheet.cell(1, 1).value = f"{str(user)} {mon}月"
+    sheet.cell(1, 1).font = openpyxl.styles.fonts.Font(size=35)
+    wb.save(output)
+    book.close()
+    output.seek(0)
+    response = HttpResponse(content=save_virtual_workbook(wb))
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
+
