@@ -132,7 +132,7 @@ def delete_info(request, info_id):
 def excel_download(request, month_id):
     month = Month.objects.get(id=month_id)
     mon = sub(r"\D", "", month.month)
-    user = request.user
+    user = month.owner
     output = io.BytesIO()
     book = xlsxwriter.Workbook(output)
     ws = book.add_worksheet('test')
