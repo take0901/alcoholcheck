@@ -5,13 +5,15 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from .models import Month, Info
 from .forms import MonthForm, InfoForm
-import csv
 import datetime
 from re import sub
 import io
 import xlsxwriter
-import openpyxl
+import openpyxl as xl
 from openpyxl.writer.excel import save_virtual_workbook
+from openpyxl.styles.borders import Border, Side
+from openpyxl.styles import Font
+from openpyxl.styles import Alignment
 
 def index(request):
     '''ホームページ'''
@@ -149,9 +151,18 @@ def excel_download(request, month_id):
         ws.write(index+4, 3, "武村義治")
     book.close()
     output.seek(0)
-    wb = openpyxl.load_workbook(output)
+    wb = xl.load_workbook(output)
     sheet = wb.worksheets[0]
     sheet.title = f"{mon}月"
+    #罫線
+    side = Side(style='thin', color='000000')
+    border = Border(top=side, bottom=side, left=side, right=side)
+
+    #フォントを設定する
+    font = Font(name='メイリオ')
+
+    #書式設定
+    alignment = Alignment(horizontal='center', vertical='center')
 
     #columnの数繰り返す
     for col in sheet.columns:
@@ -161,14 +172,15 @@ def excel_download(request, month_id):
         for cell in col:#一番文字数が多い文字の文字数をmax_lengthにいれる
             if len(str(cell.value)) > max_length:#文字数よりmax_lengthが多かったらmax_lengthを更新
                 max_length = len(str(cell.value))
+            cell.font = font #フォント
+            cell.border = border #罫線を引く
+            cell.alignment = alignment #中央に寄せる
     
         sheet.column_dimensions[column].width = (max_length+2) *2
     sheet.merge_cells('A1:D3')
     sheet.cell(1, 1).value = f"{str(user)} {mon}月"
-    sheet.cell(1, 1).font = openpyxl.styles.fonts.Font(size=35)
+    sheet.cell(1, 1).font = xl.styles.fonts.Font(size=35)
     wb.save(output)
-    book.close()
-    output.seek(0)
     response = HttpResponse(content=save_virtual_workbook(wb))
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
