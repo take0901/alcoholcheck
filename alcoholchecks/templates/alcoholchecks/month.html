@@ -1,9 +1,11 @@
 {% extends 'alcoholchecks/base.html' %}
 
 {% block page_header %}
-  <h3>{{ month }} {{ month.owner }}</h3>
-  <p><a href="{% url 'alcoholchecks:delete_month' month.id %}">{{ delete }}</a></p>
-  <p><a href="{% url 'alcoholchecks:new_info' month.id %}">記録を追加</a></p>
+  <h3>{{ month }} <a href="{% url 'alcoholchecks:monthes' month.owner.id %}" 
+    style="color: black">{{ month.owner }}</a></h3>
+  <p><a href="{% url 'alcoholchecks:delete_month' month.id %}">{{ delete }}</a>
+     <a href="{% url 'alcoholchecks:new_info' month.id %}">&emsp;記録を追加</a>
+     <a href="{% url 'alcoholchecks:check' %}">&emsp;{{ check }}</a></p>
 {% endblock page_header %}
 
 {% block content %}
@@ -11,7 +13,7 @@
     <div class="card mb-3">
         <h4 class="card-header">
             {{ info.date_added|date:'Y年m月d日 H:i' }}
-            <small><a href="{% url 'alcoholchecks:delete_info' info.id %}">{{ delete }}</a></small>
+            <small><a href="{% url 'alcoholchecks:delete_info' info.id %}">&emsp;{{ delete }}</a></small>
         </h4>
         <div class="card-body">
             {{ info.alcohol }}  車両ナンバー:{{ info.carnumber }}

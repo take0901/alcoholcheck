@@ -2,7 +2,8 @@
 
 {% block page_header %}
   <h3>月ごとの記録  {{ user }}</h3>
-  <p><a href="{% url 'alcoholchecks:new_month' user.id %}">新しい月を追加</a></p>
+  <p><a href="{% url 'alcoholchecks:new_month' user.id %}">新しい月を追加</a>
+     <a href="{% url 'alcoholchecks:check' %}">&emsp;{{ check }}</a></p>
 {% endblock page_header %}
 
 {% block content%}
@@ -10,8 +11,8 @@
     {% for month in monthes %}
       <li><h3>
         <a href="{% url 'alcoholchecks:month' month.id %}">{{ month }}</a>
-        <a href="{% url 'alcoholchecks:delete_month' month.id %}">{{ delete }}</a>
-        <a href="{% url 'alcoholchecks:excel_download' month.id %}">{{ download }}</a>
+        <a href="{% url 'alcoholchecks:delete_month' month.id %}">&nbsp;{{ delete }}</a>
+        <a href="{% url 'alcoholchecks:excel_download' month.id %}">&nbsp;{{ download }}</a>
       </h3></li>
     {% empty %}
       <li><h3>まだ記録はありません</h3></li>

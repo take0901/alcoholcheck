@@ -28,13 +28,15 @@ def monthes(request, user_id):
     user = User.objects.get(id=user_id)
     delete = ""
     download = ""
+    check = ""
     if request.user != user and str(request.user) != "alcohol_admin":
         raise Http404
     if str(request.user) == "alcohol_admin":
         delete = "削除"
         download = "ダウンロード"
+        check = "チェックする"
     monthes = user.month_set.all()
-    context = {'monthes':monthes, 'user':user, 'delete':delete, 'download':download}
+    context = {'monthes':monthes, 'user':user, 'delete':delete, 'download':download, 'check':check}
     return render(request, 'alcoholchecks/monthes.html', context)
 
 @login_required
@@ -45,8 +47,9 @@ def month(request, month_id):
         raise Http404
     if str(request.user) == "alcohol_admin":
         delete = "削除"
+        check = "チェックする"
     infos = month.info_set.order_by('-date_added')
-    context = {'month':month, 'infos':infos, 'delete':delete}
+    context = {'month':month, 'infos':infos, 'delete':delete, 'check':check}
     return render(request, 'alcoholchecks/month.html', context)
 
 @login_required
