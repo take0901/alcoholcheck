@@ -43,6 +43,7 @@ def monthes(request, user_id):
 def month(request, month_id):
     month = Month.objects.get(id=month_id)
     delete = ""
+    check = ""
     if month.owner != request.user and str(request.user) != "alcohol_admin":
         raise Http404
     if str(request.user) == "alcohol_admin":
@@ -135,6 +136,8 @@ def delete_info(request, info_id):
 
 @login_required
 def excel_download(request, month_id):
+    if str(request.user) != "alcohol_admin":
+        raise Http404
     month = Month.objects.get(id=month_id)
     mon = sub(r"\D", "", month.month)
     user = month.owner
