@@ -6,6 +6,7 @@
   </div>
   <p>
     <a href="{% url 'alcoholchecks:check' %}">{{ check }}</a><br>
-    <a href="{% url 'alcoholchecks:excel_download' %}">{{download}}</a>
+    <a href="{% url 'alcoholchecks:excel_download' %}">{{download}}</a><br>
+    <a href="{% url 'informations:infos' %}">色番号実績</a>
   <p>
 {% endblock page_header %}
