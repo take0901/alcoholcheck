@@ -1,11 +1,5 @@
 from django import forms
-from .models import Month, Info
-
-class MonthForm(forms.ModelForm):
-    class Meta:
-        model = Month
-        fields = ['month']
-        labels = {'month':""}
+from .models import Info
 
 class InfoForm(forms.ModelForm):
     class Meta:

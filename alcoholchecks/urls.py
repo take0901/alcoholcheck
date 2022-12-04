@@ -7,20 +7,14 @@ app_name = 'alcoholchecks'
 urlpatterns = [
     #ホームページ
     path('', views.index, name="index"),
-    #月ごとの記録
-    path('monthes/<int:user_id>/', views.monthes, name="monthes"),
-    #選択した月の記録
-    path('month/<int:month_id>/', views.month, name="month"),
-    #月の追加ページ
-    path('new_month/<int:user_id>/', views.new_month, name="new_month"),
+    #記録
+    path('infos/<int:user_id>/', views.infos, name="infos"),
     #記録の追加ページ
-    path('new_info/<int:month_id>/', views.new_info, name="new_info"),
+    path('new_info/<int:user_id>/', views.new_info, name="new_info"),
     #スーパーユーザーのみアクセルできる確認画面
     path('check/', views.check, name="check"),
-    #月を削除
-    path('delete_month/<int:month_id>/', views.delete_month, name="delete_month"),
     #記録を削除
     path('delete_info/<int:info_id>/', views.delete_info, name="delete_info"),
     #ダウンロード
-    path('excel_download/<int:month_id>/', views.excel_download, name="excel_download"),
+    path('excel_download/', views.excel_download, name="excel_download"),
 ]

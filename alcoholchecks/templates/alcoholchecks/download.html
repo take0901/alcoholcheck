@@ -1,0 +1,31 @@
+{% extends 'alcoholchecks/base.html' %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h3>ダウンロード</h3>
+{% endblock page_header %}
+
+{% block content %}
+  <form action="{% url 'alcoholchecks:excel_download' %}" method="post" class="form">
+    {% csrf_token %}
+    <select name="month">
+        {% for month in months %}
+          <option value="{{month}}">{{month}}月</option>
+        {% endfor %}
+    </select>
+    <select name="user">
+        {% for user in users %}
+          <option value="{{user}}">{{user}}</option>
+        {% endfor %}
+    </select>
+    <select name="year">
+      {% for year in years %}
+        <option value="{{year}}">{{year}}</option>
+      {% endfor %}
+    </select>
+    {% buttons %}
+      <br>
+      <button name="submit" class="btn btn-primary">ダウンロード</button>
+    {% endbuttons %}
+  </form>
+{% endblock content %}

@@ -1,10 +1,8 @@
 {% extends 'alcoholchecks/base.html' %}
 
 {% block page_header %}
-  <h3>{{ month }} <a href="{% url 'alcoholchecks:monthes' month.owner.id %}" 
-    style="color: black">{{ month.owner }}</a></h3>
-  <p><a href="{% url 'alcoholchecks:delete_month' month.id %}">{{ delete }}</a>&emsp;
-     <a href="{% url 'alcoholchecks:new_info' month.id %}">記録を追加</a>&emsp;
+  <h3>{{ user }}</h3>
+  <p><a href="{% url 'alcoholchecks:new_info' user.id %}">記録を追加</a>&emsp;
      <a href="{% url 'alcoholchecks:check' %}">{{ check }}</a></p>
 {% endblock page_header %}
 
@@ -20,7 +18,7 @@
         </div>
     </div>
     {% empty %}
-      <p>まだこの月には記録はありません</p>
+      <p>まだ記録はありません</p>
     {% endfor %}
 
 {% endblock content %}

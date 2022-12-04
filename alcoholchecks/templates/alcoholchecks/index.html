@@ -5,9 +5,7 @@
     <h1 class="display-3">アルコールチェックの記録</h1>
   </div>
   <p>
-    <a href="{% url 'alcoholchecks:check' %}">{{ check }}</a>
+    <a href="{% url 'alcoholchecks:check' %}">{{ check }}</a><br>
+    <a href="{% url 'alcoholchecks:excel_download' %}">{{download}}</a>
   <p>
-  </p>
-  <a href="{% url 'informations:infos' %}">色番号実績</a>
-  </p>
 {% endblock page_header %}
