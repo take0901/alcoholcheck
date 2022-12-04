@@ -18,8 +18,9 @@ class Month(models.Model):
         return self.month
 
 class Info(models.Model):
-    month = models.ForeignKey(Month, on_delete=models.CASCADE, null=True)
-    date_added = models.DateTimeField(auto_now_add=True, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    month = models.ForeignKey(Month, on_delete=models.PROTECT)
+    date_added = models.DateTimeField(auto_now_add=True)
     CHOICES = (
         ("アルコール検知: 0.00mg", "0.00mg"),
         ("アルコール検知: 0.15mg未満", "0.15mg未満"),
@@ -29,8 +30,8 @@ class Info(models.Model):
         ("6882", "6882"), ("2151", "2151"), ("2532", "2532"), ("5173", "5173"), ("5999", "5999"),
         ("386", "386"), ("783", "783"), ("2569", "2569"), ("777", "777"), ("3080", "3080")
     )
-    alcohol = models.CharField(choices=CHOICES, max_length=20,null=True)
-    carnumber = models.CharField(choices=carnumbers, max_length=20, null=True)
+    alcohol = models.CharField(choices=CHOICES, max_length=20)
+    carnumber = models.CharField(choices=carnumbers, max_length=20)
 
     def __str__(self):
         return self.alcohol
