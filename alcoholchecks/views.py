@@ -57,7 +57,7 @@ def new_info(request, user_id):
             return redirect('alcoholchecks:infos', user_id=user_id)
 
     #空のフォームを表示させる
-    context = {'form':form}
+    context = {'form':form, 'user':user}
     return render(request, 'alcoholchecks/new_info.html', context)
 
 @login_required
@@ -143,12 +143,12 @@ def excel_download(request):
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
     
-    infos = Info.objects.all()
+    infos = Info.objects.all().order_by()
     months = [info.date_added.strftime("%m") for info in infos]
     months = list(set(months))
     years = [info.date_added.strftime("%Y") for info in infos]
     years = list(set(years))
-    users = User.objects.all()
+    users = sorted(User.objects.all())
     context = {"months":months, 'users':users, 'years':years}
     return render(request, 'alcoholchecks/download.html', context)
 
