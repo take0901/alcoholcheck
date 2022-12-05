@@ -143,12 +143,12 @@ def excel_download(request):
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
     
-    infos = Info.objects.all().order_by()
+    infos = Info.objects.all().order_by("date_added")
     months = [info.date_added.strftime("%m") for info in infos]
     months = list(set(months))
     years = [info.date_added.strftime("%Y") for info in infos]
     years = list(set(years))
-    users = sorted(User.objects.all())
+    users = User.objects.all()
     context = {"months":months, 'users':users, 'years':years}
     return render(request, 'alcoholchecks/download.html', context)
 
