@@ -25,7 +25,10 @@
     </select>
     {% buttons %}
       <br>
-      <button name="submit" class="btn btn-primary">ダウンロード</button>
+      <button type="submit" class="btn btn-primary" name="download_or_delete"
+       value="download">ダウンロード</button>
+      <button type="submit" class="btn btn-primary" name="download_or_delete"
+       value="delete">一括削除</button>
     {% endbuttons %}
   </form>
 {% endblock content %}

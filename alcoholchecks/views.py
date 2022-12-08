@@ -84,65 +84,69 @@ def delete_info(request, info_id):
     return render(request, 'alcoholchecks/delete_info.html', context)
 
 @login_required
-def excel_download(request):
+def download_or_delete(request):
     if str(request.user) != "alcohol_admin":
         raise Http404
     if request.method == "POST":
-        infos = Info.objects.all()
-        month = request.POST["month"]
+        download_or_delete = request.POST["download_or_delete"]
         user = request.POST['user']
+        month = request.POST["month"]
         year = request.POST['year']
-        infos = [info for info in infos if info.date_added.strftime("%m") == month and 
-                    str(info.owner) == user and info.date_added.strftime("%Y") == year]
-        output = io.BytesIO()
-        book = xlsxwriter.Workbook(output)
-        ws = book.add_worksheet('test')
-        filename = "{}_{}_{}_data.xlsx".format(user,year, month)
-        header = ["日時", "車両ナンバー", "アルコール検知", "確認者"]
-        for i, j in enumerate(header):
-            ws.write(3, i, j)
-        for index,info in enumerate(infos):
-            info.date_added += datetime.timedelta(hours=9)
-            ws.write(index+4, 0, info.date_added.strftime('%Y/%m/%d %H:%M'))
-            ws.write(index+4, 1, int(info.carnumber))
-            ws.write(index+4, 2, info.alcohol)
-            ws.write(index+4, 3, "武村義治")
-        book.close()
-        output.seek(0)
-        wb = xl.load_workbook(output)
-        sheet = wb.worksheets[0]
-        sheet.title = f"{year}年{month}月"
-        #罫線
-        side = Side(style='thin', color='000000')
-        border = Border(top=side, bottom=side, left=side, right=side)
+        infos = Info.objects.filter(date_added__month=month, date_added__year=year)
+        infos = [info for info in infos if str(info.owner) == user]
+        if download_or_delete == "download":
+            output = io.BytesIO()
+            book = xlsxwriter.Workbook(output)
+            ws = book.add_worksheet('test')
+            filename = "{}_{}_{}_data.xlsx".format(user,year, month)
+            header = ["日時", "車両ナンバー", "アルコール検知", "確認者"]
+            for i, j in enumerate(header):
+                ws.write(3, i, j)
+            for index,info in enumerate(infos):
+                info.date_added += datetime.timedelta(hours=9)
+                ws.write(index+4, 0, info.date_added.strftime('%Y/%m/%d %H:%M'))
+                ws.write(index+4, 1, int(info.carnumber))
+                ws.write(index+4, 2, info.alcohol)
+                ws.write(index+4, 3, "武村義治")
+            book.close()
+            output.seek(0)
+            wb = xl.load_workbook(output)
+            sheet = wb.worksheets[0]
+            sheet.title = f"{year}年{month}月"
+            #罫線
+            side = Side(style='thin', color='000000')
+            border = Border(top=side, bottom=side, left=side, right=side)
 
-        #フォントを設定する
-        font = Font(name='メイリオ')
+            #フォントを設定する
+            font = Font(name='メイリオ')
 
-        #書式設定
-        alignment = Alignment(horizontal='center', vertical='center')
+            #書式設定
+            alignment = Alignment(horizontal='center', vertical='center')
 
-        #columnの数繰り返す
-        for col in sheet.columns:
-            max_length = 0#一番文字数が多い文字列の文字数
-            column = col[0].column_letter
+            #columnの数繰り返す
+            for col in sheet.columns:
+                max_length = 0#一番文字数が多い文字列の文字数
+                column = col[0].column_letter
 
-            for cell in col:#一番文字数が多い文字の文字数をmax_lengthにいれる
-                if len(str(cell.value)) > max_length:#文字数よりmax_lengthが多かったらmax_lengthを更新
-                    max_length = len(str(cell.value))
-                cell.font = font #フォント
-                cell.border = border #罫線を引く
-                cell.alignment = alignment #中央に寄せる
-    
-            sheet.column_dimensions[column].width = (max_length+2) *2
-        sheet.merge_cells('A1:D3')
-        sheet.cell(1, 1).value = f"{str(user)} {year}年  {month}月"
-        sheet.cell(1, 1).font = xl.styles.fonts.Font(size=35)
-        wb.save(output)
-        response = HttpResponse(content=save_virtual_workbook(wb))
-        response['Content-Disposition'] = 'attachment; filename=%s' % filename
-        return response
-    
+                for cell in col:#一番文字数が多い文字の文字数をmax_lengthにいれる
+                    if len(str(cell.value)) > max_length:#文字数よりmax_lengthが多かったらmax_lengthを更新
+                        max_length = len(str(cell.value))
+                    cell.font = font #フォント
+                    cell.border = border #罫線を引く
+                    cell.alignment = alignment #中央に寄せる
+
+                sheet.column_dimensions[column].width = (max_length+2) *2
+
+            sheet.merge_cells('A1:D3')
+            sheet.cell(1, 1).value = f"{str(user)} {year}年  {month}月"
+            sheet.cell(1, 1).font = xl.styles.fonts.Font(size=35)
+            wb.save(output)
+            response = HttpResponse(content=save_virtual_workbook(wb))
+            response['Content-Disposition'] = 'attachment; filename=%s' % filename
+            return response
+        else:
+            for info in infos:
+                info.delete()
     infos = Info.objects.all().order_by("date_added")
     months = [info.date_added.strftime("%m") for info in infos]
     months = list(set(months))
@@ -150,5 +154,4 @@ def excel_download(request):
     years = list(set(years))
     users = User.objects.all()
     context = {"months":months, 'users':users, 'years':years}
-    return render(request, 'alcoholchecks/download.html', context)
-
+    return render(request, 'alcoholchecks/download_or_delete.html', context)

@@ -16,5 +16,5 @@ urlpatterns = [
     #記録を削除
     path('delete_info/<int:info_id>/', views.delete_info, name="delete_info"),
     #ダウンロード
-    path('excel_download/', views.excel_download, name="excel_download"),
+    path('excel_download/', views.download_or_delete, name="excel_download"),
 ]
