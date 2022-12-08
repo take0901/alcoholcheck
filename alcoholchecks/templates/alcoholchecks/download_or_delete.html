@@ -28,7 +28,7 @@
       <button type="submit" class="btn btn-primary" name="download_or_delete"
        value="download">ダウンロード</button>
       <button type="submit" class="btn btn-primary" name="download_or_delete"
-       value="delete">一括削除</button>
+       value="delete" onclick="return confirm('この期間の記録を削除します。よろしいですか')">一括削除</button>
     {% endbuttons %}
   </form>
 {% endblock content %}
