@@ -13,9 +13,9 @@
           <option value="{{month}}">{{month}}月</option>
         {% endfor %}
     </select>
-    <select name="user">
+    <select name="user_id">
         {% for user in users %}
-          <option value="{{user}}">{{user}}</option>
+          <option value="{{user.id}}">{{user}}</option>
         {% endfor %}
     </select>
     <select name="year">

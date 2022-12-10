@@ -89,11 +89,10 @@ def download_or_delete(request):
         raise Http404
     if request.method == "POST":
         download_or_delete = request.POST["download_or_delete"]
-        user = request.POST['user']
+        user = User.objects.get(id=int(request.POST['user_id']))
         month = request.POST["month"]
         year = request.POST['year']
-        infos = Info.objects.filter(date_added__month=month, date_added__year=year)
-        infos = [info for info in infos if str(info.owner) == user]
+        infos = Info.objects.filter(date_added__month=month, date_added__year=year, owner=user)
         if download_or_delete == "download":
             output = io.BytesIO()
             book = xlsxwriter.Workbook(output)
