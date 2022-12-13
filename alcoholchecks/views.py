@@ -87,11 +87,17 @@ def delete_info(request, info_id):
 def download_or_delete(request):
     if str(request.user) != "alcohol_admin":
         raise Http404
+    infos = Info.objects.all().order_by("date_added")
+    months = [int(info.date_added.strftime("%m")) for info in infos]
+    months = list(map(str, sorted(set(months))))
+    years = [int(info.date_added.strftime("%Y")) for info in infos]
+    years = list(map(str, sorted(set(years))))
+    users = list(User.objects.all())
     if request.method == "POST":
-        download_or_delete = request.POST["download_or_delete"]
-        user = User.objects.get(id=int(request.POST['user_id']))
-        month = request.POST["month"]
-        year = request.POST['year']
+        download_or_delete = request.POST.get("download_or_delete")
+        user = User.objects.get(id=int(request.POST.get('user_id')))
+        month = request.POST.get("month")
+        year = request.POST.get('year')
         infos = Info.objects.filter(date_added__month=month, date_added__year=year, owner=user)
         if download_or_delete == "download":
             output = io.BytesIO()
@@ -143,14 +149,16 @@ def download_or_delete(request):
             response = HttpResponse(content=save_virtual_workbook(wb))
             response['Content-Disposition'] = 'attachment; filename=%s' % filename
             return response
-        else:
+        elif download_or_delete == "delete":
             for info in infos:
                 info.delete()
-    infos = Info.objects.all().order_by("date_added")
-    months = [info.date_added.strftime("%m") for info in infos]
-    months = list(set(months))
-    years = [info.date_added.strftime("%Y") for info in infos]
-    years = list(set(years))
-    users = User.objects.all()
-    context = {"months":months, 'users':users, 'years':years}
+        remove_and_insert(users, user)
+        remove_and_insert(months, month)
+        remove_and_insert(years, year)
+    context = {"months":months, 'users':users, 'years':years, 'infos':infos}
     return render(request, 'alcoholchecks/download_or_delete.html', context)
+
+def remove_and_insert(list, index):
+    if index in list:
+        list.remove(index)
+        list.insert(0,index)

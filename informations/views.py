@@ -6,31 +6,37 @@ from .forms import InfoForm
 
 @login_required
 def infos(request):
-    infos = Information.objects.all().order_by('-year', "month")
+    infos = Information.objects.all().order_by('-year', "-month")
     year_list, month_list, motouke_list = [], [], []
     for info in infos:
-        year_list.append(info.year)
-        month_list.append(info.month)
+        year_list.append(int(info.year))
+        month_list.append(int(info.month))
         motouke_list.append(info.motouke)
-    year_list = list(set(year_list))
-    month_list = list(set(month_list))
+    year_list = list(map(str, sorted(set(year_list))))
+    month_list = list(map(str, sorted(set(month_list))))
     motouke_list = list(set(motouke_list))
-    if request.method == "POST":
+    year_list.insert(0,"すべての")
+    month_list.insert(0,"すべての")
+    motouke_list.insert(0,"すべて")
+    if request.method == "POST" and request.POST.get("reset") != "reset":
         years, months, motoukes = [],[], [] 
         year = request.POST['year']
         years.append(year)
-        if year == "all":
+        if year == "すべての":
             years = year_list
         month = request.POST['month']
         months.append(month)
-        if month == "all2":
+        if month == "すべての":
             months = month_list
         motouke = request.POST['motouke']
         motoukes.append(motouke)
-        if motouke == "all3":
+        if motouke == "すべて":
             motoukes = motouke_list
+        remove_and_insert(year_list, year)
+        remove_and_insert(month_list, month)
+        remove_and_insert(motouke_list, motouke)
         infos = Information.objects.filter(year__in=years, month__in=months
-        ,motouke__in=motoukes).order_by("-year", 'month')
+        ,motouke__in=motoukes).order_by("-year", '-month')
     context = {'infos':infos, 'years':year_list, 'months':month_list, 'motoukes':motouke_list}
     return render(request, 'informations/infos.html', context)
 
@@ -69,5 +75,7 @@ def edit_info(request, info_id):
     context = {'form':form, 'info_id':info_id}
     return render(request, 'informations/edit_info.html', context=context)
 
-    
+def remove_and_insert(list, index):
+    list.remove(index)
+    list.insert(0,index)
     

@@ -13,24 +13,23 @@
     {% csrf_token %}
     <h2>絞り込み</h2>
     <select name="year">
-      <option value="all">すべて</option>
       {% for year in years %}
       <option value="{{year}}">{{year}}年</option>
       {% endfor %}
     </select>
     <select name="month">
-      <option value="all2">すべて</option>
       {% for month in months %}
       <option value="{{month}}">{{month}}月</option>
       {% endfor %}
     </select>
     <select name="motouke">
-      <option value="all3">すべて</option>
       {% for motouke in motoukes %}
       <option value="{{motouke}}">{{motouke}}</option>
       {% endfor %}
     </select>
-    <input type="submit" name="button" value="更新">
+    <button type="submit" class="btn btn-primary">更新</button>
+    <button type="submit" class="btn btn-primary" name="reset"
+     value="reset">リセット</button>
     </form>
 
   <p>

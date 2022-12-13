@@ -29,6 +29,21 @@
        value="download">ダウンロード</button>
       <button type="submit" class="btn btn-primary" name="download_or_delete"
        value="delete" onclick="return confirm('この期間の記録を削除します。よろしいですか')">一括削除</button>
+      <button type="submit" class="btn btn-primary">更新</button>
     {% endbuttons %}
   </form>
+
+  {% for info in infos %}
+    <div class="card mb-3">
+        <h4 class="card-header">
+            {{ info.date_added|date:'Y年m月d日 H:i' }}
+        </h4>
+        <div class="card-body">
+            {{ info.alcohol }}  車両ナンバー:{{ info.carnumber }}
+        </div>
+    </div>
+    {% empty %}
+      <p>まだ記録はありません</p>
+    {% endfor %}
+
 {% endblock content %}
