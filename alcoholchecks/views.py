@@ -87,11 +87,9 @@ def delete_info(request, info_id):
 def download_or_delete(request):
     if str(request.user) != "alcohol_admin":
         raise Http404
-    infos = Info.objects.all().order_by("date_added")
-    months = [int(info.date_added.strftime("%m")) for info in infos]
-    months = list(map(str, sorted(set(months))))
-    years = [int(info.date_added.strftime("%Y")) for info in infos]
-    years = list(map(str, sorted(set(years))))
+    infos = []
+    months = list(Info.objects.values_list("date_added__month", flat=True).distinct())
+    years = list(Info.objects.values_list("date_added__year", flat=True).distinct())
     users = list(User.objects.all())
     if request.method == "POST":
         download_or_delete = request.POST.get("download_or_delete")
@@ -153,12 +151,13 @@ def download_or_delete(request):
             for info in infos:
                 info.delete()
         remove_and_insert(users, user)
-        remove_and_insert(months, month)
-        remove_and_insert(years, year)
+        remove_and_insert(months, int(month))
+        remove_and_insert(years, int(year))
     context = {"months":months, 'users':users, 'years':years, 'infos':infos}
     return render(request, 'alcoholchecks/download_or_delete.html', context)
 
 def remove_and_insert(list, index):
     if index in list:
         list.remove(index)
+        print(list)
         list.insert(0,index)

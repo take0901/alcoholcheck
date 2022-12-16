@@ -7,14 +7,9 @@ from .forms import InfoForm
 @login_required
 def infos(request):
     infos = Information.objects.all().order_by('-year', "-month")
-    year_list, month_list, motouke_list = [], [], []
-    for info in infos:
-        year_list.append(int(info.year))
-        month_list.append(int(info.month))
-        motouke_list.append(info.motouke)
-    year_list = list(map(str, sorted(set(year_list))))
-    month_list = list(map(str, sorted(set(month_list))))
-    motouke_list = list(set(motouke_list))
+    year_list = sorted(list(map(int,Information.objects.values_list("year", flat=True).distinct())))
+    month_list = sorted(list(map(int,Information.objects.values_list("month", flat=True).distinct())))
+    motouke_list = list(Information.objects.values_list("motouke", flat=True).distinct())
     year_list.insert(0,"すべての")
     month_list.insert(0,"すべての")
     motouke_list.insert(0,"すべて")
@@ -24,16 +19,18 @@ def infos(request):
         years.append(year)
         if year == "すべての":
             years = year_list
+        else:
+            remove_and_insert(year_list, int(year))
         month = request.POST['month']
         months.append(month)
         if month == "すべての":
             months = month_list
+        else:
+            remove_and_insert(month_list, int(month))
         motouke = request.POST['motouke']
         motoukes.append(motouke)
-        if motouke == "すべて":
+        if motouke == "すべて": 
             motoukes = motouke_list
-        remove_and_insert(year_list, year)
-        remove_and_insert(month_list, month)
         remove_and_insert(motouke_list, motouke)
         infos = Information.objects.filter(year__in=years, month__in=months
         ,motouke__in=motoukes).order_by("-year", '-month')
