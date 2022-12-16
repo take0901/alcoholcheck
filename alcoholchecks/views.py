@@ -88,8 +88,8 @@ def download_or_delete(request):
     if str(request.user) != "alcohol_admin":
         raise Http404
     infos = []
-    months = list(Info.objects.values_list("date_added__month", flat=True).distinct())
-    years = list(Info.objects.values_list("date_added__year", flat=True).distinct())
+    months = sorted(list(Info.objects.values_list("date_added__month", flat=True).distinct()))
+    years = sorted(list(Info.objects.values_list("date_added__year", flat=True).distinct()))
     users = list(User.objects.all())
     if request.method == "POST":
         download_or_delete = request.POST.get("download_or_delete")
