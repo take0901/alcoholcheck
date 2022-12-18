@@ -136,3 +136,4 @@ if not DEBUG:
     SECRET_KEY = os.environ['SECRET_KEY']
 
 SESSION_COOKIE_AGE = 60 * 15
+AUTH_USER_MODEL = 'users.User'
