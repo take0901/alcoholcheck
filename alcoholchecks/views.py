@@ -96,7 +96,7 @@ def download_or_delete(request):
         user = User.objects.get(id=int(request.POST.get('user_id')))
         month = request.POST.get("month")
         year = request.POST.get('year')
-        infos = Info.objects.filter(date_added__month=month, date_added__year=year, owner=user)
+        infos = Info.objects.filter(date_added__month=month, date_added__year=year, owner=user).order_by("date_added")
         if download_or_delete == "download":
             output = io.BytesIO()
             book = xlsxwriter.Workbook(output)
