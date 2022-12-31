@@ -19,14 +19,12 @@ def infos(request):
         years.append(year)
         if year == "すべての":
             years = year_list
-        else:
-            remove_and_insert(year_list, int(year))
+        remove_and_insert(year_list, int(year))
         month = request.POST['month']
         months.append(month)
         if month == "すべての":
             months = month_list
-        else:
-            remove_and_insert(month_list, int(month))
+        remove_and_insert(month_list, int(month))
         motouke = request.POST['motouke']
         motoukes.append(motouke)
         if motouke == "すべて": 
@@ -39,8 +37,11 @@ def infos(request):
 
 @login_required
 def new_info(request):
-    if str(request.user) != "alcohol_admin":
-        raise Http404
+    years = Information.objects.values_list("year", flat=True).distinct()
+    months = Information.objects.values_list('month', flat=True).distinct()
+    companies = Information.objects.values_list("motouke", flat=True).distinct()
+    kouzis = Information.objects.values_list('kouzi', flat=True).distinct()
+    places = Information.objects.values_list("place", flat=True).distinct()
     
     if request.method != 'POST':
         #フォームを生成
@@ -49,9 +50,16 @@ def new_info(request):
         #POSTで送信されたデータを処理
         form = InfoForm(data=request.POST)
         if form.is_valid():
-            form.save()
+            new_info = form.save(commit=False)
+            new_info.year = request.POST.get('y')
+            new_info.month = request.POST.get('m')
+            new_info.motouke = request.POST.get('c')
+            new_info.kouzi = request.POST.get('k')
+            new_info.place = request.POST.get('p')
+            new_info.save() 
             return redirect('informations:infos')
-    context = {'form':form}
+    context = {'form':form, 'years':years, 'months':months,
+     'companies':companies, 'kouzis':kouzis, 'places':places}
     return render(request, 'informations/new_info.html', context)
 
 @login_required
