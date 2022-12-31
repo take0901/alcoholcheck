@@ -7,8 +7,8 @@ from .forms import InfoForm
 @login_required
 def infos(request):
     infos = Information.objects.all().order_by('-year', "-month")
-    year_list = sorted(list(map(int,Information.objects.values_list("year", flat=True).distinct())))
-    month_list = sorted(list(map(int,Information.objects.values_list("month", flat=True).distinct())))
+    year_list = sorted(list(Information.objects.values_list("year", flat=True).distinct()))
+    month_list = sorted(list(Information.objects.values_list("month", flat=True).distinct()))
     motouke_list = list(Information.objects.values_list("motouke", flat=True).distinct())
     year_list.insert(0,"すべての")
     month_list.insert(0,"すべての")
@@ -19,12 +19,16 @@ def infos(request):
         years.append(year)
         if year == "すべての":
             years = year_list
-        remove_and_insert(year_list, int(year))
+            years.pop(0)
+        else:
+            remove_and_insert(year_list, int(year))
         month = request.POST['month']
         months.append(month)
         if month == "すべての":
             months = month_list
-        remove_and_insert(month_list, int(month))
+            months.pop(0)
+        else:
+            remove_and_insert(month_list, int(month))
         motouke = request.POST['motouke']
         motoukes.append(motouke)
         if motouke == "すべて": 
@@ -37,8 +41,8 @@ def infos(request):
 
 @login_required
 def new_info(request):
-    years = Information.objects.values_list("year", flat=True).distinct()
-    months = Information.objects.values_list('month', flat=True).distinct()
+    years = sorted(list(Information.objects.values_list("year", flat=True).distinct()))
+    months = sorted(list(Information.objects.values_list('month', flat=True).distinct()))
     companies = Information.objects.values_list("motouke", flat=True).distinct()
     kouzis = Information.objects.values_list('kouzi', flat=True).distinct()
     places = Information.objects.values_list("place", flat=True).distinct()
@@ -64,6 +68,11 @@ def new_info(request):
 
 @login_required
 def edit_info(request, info_id):
+    years = sorted(list(Information.objects.values_list("year", flat=True).distinct()))
+    months = sorted(list(Information.objects.values_list('month', flat=True).distinct()))
+    companies = Information.objects.values_list("motouke", flat=True).distinct()
+    kouzis = Information.objects.values_list('kouzi', flat=True).distinct()
+    places = Information.objects.values_list("place", flat=True).distinct()
     info = Information.objects.get(id=info_id)
     if str(request.user) != "alcohol_admin":
         Http404
@@ -74,10 +83,17 @@ def edit_info(request, info_id):
     else:
         form = InfoForm(instance=info, data=request.POST)
         if form.is_valid:
-            form.save()
+            edit_info = form.save(commit=False)
+            edit_info.year = int(request.POST['y'])
+            edit_info.month = int(request.POST['m'])
+            edit_info.motouke = request.POST['c']
+            edit_info.kouzi = request.POST['k']
+            edit_info.place = request.POST['p']
+            edit_info.save()
         return redirect('informations:infos')
 
-    context = {'form':form, 'info_id':info_id}
+    context = {'form':form, 'info_id':info_id, 'info':info, 'years':years, 'months':months, 
+                'companies':companies, 'kouzis':kouzis, 'places':places}
     return render(request, 'informations/edit_info.html', context=context)
 
 def remove_and_insert(list, index):

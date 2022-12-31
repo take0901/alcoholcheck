@@ -18,36 +18,36 @@
   <form action="{% url 'informations:new_info' %}" method="post" class="form">
     {% csrf_token %}
     <label for="yearselect">年</label><br>
-    <input type="text" name="y" list="ye" id="yearselect" maxlength="10">
-    <datalist id="ye" name="y">
+    <input type="number" name="y" list="ye" id="yearselect" max="9999">
+    <datalist id="ye" name="y" aria-required="true">
       {% for year in years %}
       <option value="{{year}}"></option>
       {% endfor %}
     </datalist><br>
     <label for="monthselect">月</label><br>
-    <input type="text" name="m" list="mon" id="monthselect" maxlength="10">
-    <datalist id="mon" name="m">
+    <input type="number" name="m" list="mon" id="monthselect" max="12">
+    <datalist id="mon" name="m" aria-required="true">
       {% for month in months %}
       <option value="{{month}}"></option>
       {% endfor %}
     </datalist><br>
     <label for="companyselect">元請</label><br>
     <input type="text" name="c" list="com" id="companyselect" maxlength="20">
-    <datalist id="com" name="c">
+    <datalist id="com" name="c" aria-required="true">
       {% for company in companies %}
       <option value="{{company}}"></option>
       {% endfor %}
     </datalist><br>
     <label for="kouziselect">工事名</label><br>
-    <input type="text" name="k" list="kou" id="kouziselect" maxlength="20">
-    <datalist id="kou" name="k">
+    <input type="text" name="k" list="kou" id="kouziselect" maxlength="20" required>
+    <datalist id="kou" name="k" aria-required="true">
       {% for kouzi in kouzis %}
       <option value="{{kouzi}}"></option>
       {% endfor %}
     </datalist><br>
     <label for="placeselect">場所</label><br>
     <input type="text" name="p" list="pl" id="place" maxlength="20">
-    <datalist id="pl" name="p">
+    <datalist id="pl" name="p" aria-required="true">
       {% for place in places %}
       <option value="{{place}}"></option>
       {% endfor %}

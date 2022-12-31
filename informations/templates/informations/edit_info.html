@@ -7,10 +7,51 @@
 
 {% block content %}
 
+  <style>
+    input{
+      width: 100%;
+    }
+  </style>
+
   <p><a href="{% url 'informations:infos' %}">色番号実績</a></p>
 
   <form action="{% url 'informations:edit_info' info_id %}" method="post" class="form">
     {% csrf_token %}
+    <label for="yearselect">年</label><br>
+    <input type="text" name="y" list="ye" id="yearselect" maxlength="10" value="{{info.year}}">
+    <datalist id="ye" name="y" aria-required="true">
+      {% for year in years %}
+      <option value="{{year}}"></option>
+      {% endfor %}
+    </datalist><br>
+    <label for="monthselect">月</label><br>
+    <input type="text" name="m" list="mon" id="monthselect" maxlength="10" value="{{info.month}}">
+    <datalist id="mon" name="m" aria-required="true">
+      {% for month in months %}
+      <option value="{{month}}"></option>
+      {% endfor %}
+    </datalist><br>
+    <label for="companyselect">元請</label><br>
+    <input type="text" name="c" list="com" id="companyselect" maxlength="20" value="{{info.motouke}}">
+    <datalist id="com" name="c" aria-required="true">
+      {% for company in companies %}
+      <option value="{{company}}"></option>
+      {% endfor %}
+    </datalist><br>
+    <label for="kouziselect">工事名</label><br>
+    <input type="text" name="k" list="kou" id="kouziselect" maxlength="20" value="{{info.kouzi}}">
+    <datalist id="kou" name="k" aria-required="true">
+      {% for kouzi in kouzis %}
+      <option value="{{kouzi}}"></option>
+      {% endfor %}
+    </datalist><br>
+    <label for="placeselect">場所</label><br>
+    <input type="text" name="p" list="pl" id="place" maxlength="20" value="{{info.place}}">
+    <datalist id="pl" name="p" aria-required="true">
+      {% for place in places %}
+      <option value="{{place}}"></option>
+      {% endfor %}
+    </datalist>
     {% bootstrap_form form %}
     {% buttons %}
       <button name="submit" class="btn btn-primary">記録を編集</button>
