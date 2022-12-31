@@ -1,8 +1,8 @@
 from django.db import models
 
 class Information(models.Model):
-    year = models.IntegerField(max_length=10)
-    month = models.IntegerField(max_length=10)
+    year = models.IntegerField()
+    month = models.IntegerField()
     motouke = models.CharField(max_length=20)
     kouzi = models.CharField(max_length=20, default="")
     place = models.CharField(max_length=20)
