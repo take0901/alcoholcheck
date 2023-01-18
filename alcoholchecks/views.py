@@ -47,6 +47,8 @@ def new_info(request, user_id):
     if request.method != 'POST':
         #フォームを生成
         form = InfoForm(initial={'carnumber':user.carnumber, 'alcohol':"アルコール検知: 0.00mg"})
+        form.fields['carnumber'].choices = list(User.objects.values_list("carnumber", 
+                                                            'carnumber').distinct())
     else:
         #POSTで送信されたデータを処理
         form = InfoForm(data=request.POST)
