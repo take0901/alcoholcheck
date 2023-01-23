@@ -7,12 +7,12 @@ from .models import Info
 from .forms import InfoForm
 import datetime
 import io
-import xlsxwriter
 import openpyxl as xl
 from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.styles.borders import Border, Side
 from openpyxl.styles import Font
 from openpyxl.styles import Alignment
+import zipfile
 
 def index(request):
     #ホームページ
@@ -93,69 +93,70 @@ def download_or_delete(request):
     months = sorted(list(Info.objects.values_list("date_added__month", flat=True).distinct()))
     years = sorted(list(Info.objects.values_list("date_added__year", flat=True).distinct()))
     users = list(User.objects.all())
+    users.remove(User.objects.get(id=1))
     if request.method == "POST":
         download_or_delete = request.POST.get("download_or_delete")
-        user = User.objects.get(id=int(request.POST.get('user_id')))
         month = request.POST.get("month")
         year = request.POST.get('year')
-        infos = Info.objects.filter(date_added__month=month, date_added__year=year, owner=user).order_by("date_added")
+        infos = Info.objects.filter(date_added__month=month, date_added__year=year).order_by("date_added")
         if download_or_delete == "download":
-            output = io.BytesIO()
-            book = xlsxwriter.Workbook(output)
-            ws = book.add_worksheet('test')
-            filename = "{}_{}_{}_data.xlsx".format(user,year, month)
-            header = ["日時", "車両ナンバー", "アルコール検知", "確認者"]
-            for i, j in enumerate(header):
-                ws.write(3, i, j)
-            for index,info in enumerate(infos):
-                info.date_added += datetime.timedelta(hours=9)
-                ws.write(index+4, 0, info.date_added.strftime('%Y/%m/%d %H:%M'))
-                ws.write(index+4, 1, int(info.carnumber))
-                ws.write(index+4, 2, info.alcohol)
-                ws.write(index+4, 3, "武村義治")
-            book.close()
-            output.seek(0)
-            wb = xl.load_workbook(output)
-            sheet = wb.worksheets[0]
-            sheet.title = f"{year}年{month}月"
-            #罫線
-            side = Side(style='thin', color='000000')
-            border = Border(top=side, bottom=side, left=side, right=side)
+            response = HttpResponse(content_type="application/zip")
+            zip = zipfile.ZipFile(response, "w")
 
-            #フォントを設定する
-            font = Font(name='メイリオ')
+            zipname = f"{year}_{month}_data.zip"
+            for user in users:
+                output = io.BytesIO()
+                filename = "{}_{}_{}_data.xlsx".format(user,year, month)
+                wb = xl.Workbook()
+                sheet = wb.active
+                header = ["日時", "車両ナンバー", "アルコール検知", "確認者"]
+                for i, j in enumerate(header):
+                    sheet.cell(column=i+1, row=4, value=j)
+                for index,info in enumerate(infos):
+                    info.date_added += datetime.timedelta(hours=9)
+                    sheet.cell(row=index+5, column=1, value=info.date_added.strftime('%Y/%m/%d %H:%M'))
+                    sheet.cell(row=index+5,column=2, value=int(info.carnumber))
+                    sheet.cell(row=index+5, column=3, value=info.alcohol)
+                    sheet.cell(row=index+5, column=4, value="武村義治")
+                sheet.title = f"{year}年{month}月"
+                #罫線
+                side = Side(style='thin', color='000000')
+                border = Border(top=side, bottom=side, left=side, right=side)
 
-            #書式設定
-            alignment = Alignment(horizontal='center', vertical='center')
+                #フォントを設定する
+                font = Font(name='メイリオ')
 
-            #columnの数繰り返す
-            for col in sheet.columns:
-                max_length = 0#一番文字数が多い文字列の文字数
-                column = col[0].column_letter
+                #書式設定
+                alignment = Alignment(horizontal='center', vertical='center')
 
-                for cell in col:#一番文字数が多い文字の文字数をmax_lengthにいれる
-                    if len(str(cell.value)) > max_length:#文字数よりmax_lengthが多かったらmax_lengthを更新
-                        max_length = len(str(cell.value))
-                    cell.font = font #フォント
-                    cell.border = border #罫線を引く
-                    cell.alignment = alignment #中央に寄せる
+                #columnの数繰り返す
+                for col in sheet.columns:
+                    max_length = 0#一番文字数が多い文字列の文字数
+                    column = col[0].column_letter
 
-                sheet.column_dimensions[column].width = (max_length+2) *2
+                    for cell in col:#一番文字数が多い文字の文字数をmax_lengthにいれる
+                        if len(str(cell.value)) > max_length:#文字数よりmax_lengthが多かったらmax_lengthを更新
+                            max_length = len(str(cell.value))
+                        cell.font = font #フォント
+                        cell.border = border #罫線を引く
+                        cell.alignment = alignment #中央に寄せる
 
-            sheet.merge_cells('A1:D3')
-            sheet.cell(1, 1).value = f"{str(user)} {year}年  {month}月"
-            sheet.cell(1, 1).font = xl.styles.fonts.Font(size=35)
-            wb.save(output)
-            response = HttpResponse(content=save_virtual_workbook(wb))
-            response['Content-Disposition'] = 'attachment; filename=%s' % filename
+                    sheet.column_dimensions[column].width = (max_length+2) *2
+
+                sheet.merge_cells('A1:D3')
+                sheet.cell(1, 1).value = f"{str(user)} {year}年  {month}月"
+                sheet.cell(1, 1).font = xl.styles.fonts.Font(size=35)
+                wb.save(output)
+                zip.writestr(filename, output.getvalue())
+
+            response['Content-Disposition'] = 'attachment; filename=%s' % zipname
             return response
         elif download_or_delete == "delete":
             for info in infos:
                 info.delete()
-        remove_and_insert(users, user)
         remove_and_insert(months, int(month))
         remove_and_insert(years, int(year))
-    context = {"months":months, 'users':users, 'years':years, 'infos':infos}
+    context = {"months":months, 'years':years, 'infos':infos}
     return render(request, 'alcoholchecks/download_or_delete.html', context)
 
 def remove_and_insert(list, index):
