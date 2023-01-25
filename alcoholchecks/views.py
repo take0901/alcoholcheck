@@ -13,6 +13,7 @@ from openpyxl.styles.borders import Border, Side
 from openpyxl.styles import Font
 from openpyxl.styles import Alignment
 import zipfile
+from django.http import JsonResponse
 
 def index(request):
     #ホームページ
@@ -98,7 +99,12 @@ def download_or_delete(request):
         download_or_delete = request.POST.get("download_or_delete")
         month = request.POST.get("month")
         year = request.POST.get('year')
-        infos = Info.objects.filter(date_added__month=month, date_added__year=year).order_by("date_added")
+        months = list(Info.objects.filter(date_added__year=year).values_list(
+                                        'date_added__month', flat=True).distinct().order_by())
+        month = months[0]
+        infos = Info.objects.filter(date_added__month=month,
+                                     date_added__year=year).order_by("date_added")
+        
         if download_or_delete == "download":
             response = HttpResponse(content_type="application/zip")
             zip = zipfile.ZipFile(response, "w")
@@ -162,5 +168,4 @@ def download_or_delete(request):
 def remove_and_insert(list, index):
     if index in list:
         list.remove(index)
-        print(list)
         list.insert(0,index)

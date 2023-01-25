@@ -8,15 +8,15 @@
 {% block content %}
   <form action="{% url 'alcoholchecks:excel_download' %}" method="post" class="form">
     {% csrf_token %}
+    <select name="year">
+      {% for year in years %}
+        <option value="{{year}}">{{year}}年</option>
+      {% endfor %}
+    </select>
     <select name="month">
         {% for month in months %}
           <option value="{{month}}">{{month}}月</option>
         {% endfor %}
-    </select>
-    <select name="year">
-      {% for year in years %}
-        <option value="{{year}}">{{year}}</option>
-      {% endfor %}
     </select>
     {% buttons %}
       <br>

@@ -14,26 +14,26 @@ def infos(request):
     month_list.insert(0,"すべての")
     motouke_list.insert(0,"すべて")
     if request.method == "POST" and request.POST.get("reset") != "reset":
-        years, months, motoukes = [],[], [] 
+        years, months, motoukes = [],[],[] 
         year = request.POST['year']
-        years.append(year)
         if year == "すべての":
-            years = year_list
-            years.pop(0)
+            years = sorted(list(Information.objects.values_list("year", flat=True).distinct()))
         else:
+            years.append(int(year))
             remove_and_insert(year_list, int(year))
         month = request.POST['month']
-        months.append(month)
         if month == "すべての":
-            months = month_list
-            months.pop(0)
+            months = sorted(list(Information.objects.values_list("month", flat=True).distinct()))
         else:
+            months.append(int(month))
             remove_and_insert(month_list, int(month))
         motouke = request.POST['motouke']
         motoukes.append(motouke)
         if motouke == "すべて": 
-            motoukes = motouke_list
-        remove_and_insert(motouke_list, motouke)
+            motoukes = list(Information.objects.values_list("motouke", flat=True).distinct())
+        else:
+            remove_and_insert(motouke_list, motouke)
+        print(years)
         infos = Information.objects.filter(year__in=years, month__in=months
         ,motouke__in=motoukes).order_by("-year", '-month')
     context = {'infos':infos, 'years':year_list, 'months':month_list, 'motoukes':motouke_list}
