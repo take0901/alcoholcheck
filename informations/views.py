@@ -16,24 +16,37 @@ def infos(request):
     if request.method == "POST" and request.POST.get("reset") != "reset":
         years, months, motoukes = [],[],[] 
         year = request.POST['year']
+        month = request.POST['month']
+        motouke = request.POST['motouke']
         if year == "すべての":
             years = sorted(list(Information.objects.values_list("year", flat=True).distinct()))
         else:
+            month_list = list(sorted(Information.objects.filter(year=year).values_list(
+                        'month', flat=True).distinct()))
+            if month != 'すべての':
+                motouke_list = list(sorted(Information.objects.filter(month=month).values_list(
+                        'motouke', flat=True).distinct()))
+            else:
+                motouke_list = list(sorted(Information.objects.filter(
+                 year=year).values_list('motouke', flat=True).distinct()))
+            motouke_list.insert(0, 'すべて')
+            month_list.insert(0, 'すべての')
             years.append(int(year))
             remove_and_insert(year_list, int(year))
-        month = request.POST['month']
         if month == "すべての":
             months = sorted(list(Information.objects.values_list("month", flat=True).distinct()))
         else:
+            motouke_list = list(sorted(Information.objects.filter(month=month).values_list(
+                        'motouke', flat=True).distinct()))
+            motouke_list.insert(0, 'すべて')
             months.append(int(month))
             remove_and_insert(month_list, int(month))
-        motouke = request.POST['motouke']
         motoukes.append(motouke)
         if motouke == "すべて": 
             motoukes = list(Information.objects.values_list("motouke", flat=True).distinct())
         else:
             remove_and_insert(motouke_list, motouke)
-        print(years)
+
         infos = Information.objects.filter(year__in=years, month__in=months
         ,motouke__in=motoukes).order_by("-year", '-month')
     context = {'infos':infos, 'years':year_list, 'months':month_list, 'motoukes':motouke_list}
@@ -97,6 +110,7 @@ def edit_info(request, info_id):
     return render(request, 'informations/edit_info.html', context=context)
 
 def remove_and_insert(list, index):
-    list.remove(index)
-    list.insert(0,index)
+    if index in list:
+        list.remove(index)
+        list.insert(0,index)
     
