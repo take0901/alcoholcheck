@@ -9,4 +9,5 @@ urlpatterns = [
     path('new_info/', views.new_info, name="new_info"),
     #記録の編集
     path('edit_info/<int:info_id>/', views.edit_info, name="edit_info"),
+    path("ajax/", views.ajax, name="ajax")
 ]

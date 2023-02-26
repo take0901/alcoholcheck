@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from .models import Information
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, JsonResponse
+from django.core import serializers
 from .forms import InfoForm
 
 @login_required
@@ -13,42 +14,6 @@ def infos(request):
     year_list.insert(0,"すべての")
     month_list.insert(0,"すべての")
     motouke_list.insert(0,"すべて")
-    if request.method == "POST" and request.POST.get("reset") != "reset":
-        years, months, motoukes = [],[],[] 
-        year = request.POST['year']
-        month = request.POST['month']
-        motouke = request.POST['motouke']
-        if year == "すべての":
-            years = sorted(list(Information.objects.values_list("year", flat=True).distinct()))
-        else:
-            month_list = list(sorted(Information.objects.filter(year=year).values_list(
-                        'month', flat=True).distinct()))
-            if month != 'すべての':
-                motouke_list = list(sorted(Information.objects.filter(month=month).values_list(
-                        'motouke', flat=True).distinct()))
-            else:
-                motouke_list = list(sorted(Information.objects.filter(
-                 year=year).values_list('motouke', flat=True).distinct()))
-            motouke_list.insert(0, 'すべて')
-            month_list.insert(0, 'すべての')
-            years.append(int(year))
-            remove_and_insert(year_list, int(year))
-        if month == "すべての":
-            months = sorted(list(Information.objects.values_list("month", flat=True).distinct()))
-        else:
-            motouke_list = list(sorted(Information.objects.filter(month=month).values_list(
-                        'motouke', flat=True).distinct()))
-            motouke_list.insert(0, 'すべて')
-            months.append(int(month))
-            remove_and_insert(month_list, int(month))
-        motoukes.append(motouke)
-        if motouke == "すべて": 
-            motoukes = list(Information.objects.values_list("motouke", flat=True).distinct())
-        else:
-            remove_and_insert(motouke_list, motouke)
-
-        infos = Information.objects.filter(year__in=years, month__in=months
-        ,motouke__in=motoukes).order_by("-year", '-month')
     context = {'infos':infos, 'years':year_list, 'months':month_list, 'motoukes':motouke_list}
     return render(request, 'informations/infos.html', context)
 
@@ -109,8 +74,28 @@ def edit_info(request, info_id):
                 'companies':companies, 'kouzis':kouzis, 'places':places}
     return render(request, 'informations/edit_info.html', context=context)
 
-def remove_and_insert(list, index):
-    if index in list:
-        list.remove(index)
-        list.insert(0,index)
-    
+@login_required
+def ajax(request):
+    years = sorted(list(Information.objects.values_list("year", flat=True).distinct()))
+    months = sorted(list(Information.objects.values_list('month', flat=True).distinct()))
+    motoukes = Information.objects.values_list("motouke", flat=True).distinct()
+    yearl, monthl, motoukel = [],[],[]
+    year = request.POST.get('year')
+    month = request.POST.get('month')
+    motouke = request.POST.get('motouke')
+    if year == "すべての":
+        yearl = years
+    else:
+        yearl.append(int(year))
+    if month == "すべての":
+        monthl = months
+    else:
+        monthl.append(int(month))
+    if motouke == "すべて":
+        motoukel = motoukes
+    else:
+        motoukel.append(motouke)
+    infos = Information.objects.filter(year__in=yearl, month__in=monthl
+    ,motouke__in=motoukel).order_by("-year", '-month')
+    dic = {'infos':serializers.serialize("json",infos)}
+    return JsonResponse(dic)

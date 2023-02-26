@@ -9,7 +9,9 @@
     table {background-color: lightyellow;}
     table th, table td {border: solid 1px black;}
   </style>
+  <div class="test"></div>
   <form action="{% url 'informations:infos' %}" method="post" id="form">
+    
     {% csrf_token %}
     <h2>絞り込み</h2>
     <select name="year" id="year" onchange="document.getElementById('button').click();">
@@ -35,7 +37,7 @@
   <p>
     <a href="{% url 'informations:new_info' %}">新しい記録を追加</a>
   </p>
-    <table width="150%" cellpadding="10">
+    <table width="150%" cellpadding="10" id="table">
       <tr>
           <th>年</th>
           <th>月</th>
@@ -59,5 +61,69 @@
         </tr>
       {% endfor %}
     </table>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+      function getCookie(name) {
+              var cookieValue = null;
+              if (document.cookie && document.cookie !== '') {
+                  var cookies = document.cookie.split(';');
+                  for (var i = 0; i < cookies.length; i++) {
+                      var cookie = jQuery.trim(cookies[i]);
+                      // Does this cookie string begin with the name we want?
+                      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                          break;
+                      }
+                  }
+              }
+              return cookieValue;
+          }
+  
+          var csrftoken = getCookie('csrftoken');
+  
+          function csrfSafeMethod(method) {
+              // these HTTP methods do not require CSRF protection
+              return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+          }
+  
+          $.ajaxSetup({
+              beforeSend: function (xhr, settings) {
+                  if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                  }
+              }
+          });
+    $('#button').on('click', function(e) {
+      e.preventDefault();
+  
+      $.ajax({
+          'url': '{% url "informations:ajax" %}',
+          'type': 'POST',
+          'data': {
+                  'year': $('#year').val(),
+                  'month': $('#month').val(),
+                  'motouke': $('#motouke').val(),
+                  },
+          'dataType': 'json'
+              })
+      .done(function(response){
+      $('#table').empty();
+      const infos_list = JSON.parse(response.infos);
+      $('#table').append("<tr><th>年</th><th>月</th><th>元請名</th><th>工事名</th><th> \
+        場所</th><th>色番号</th><th>備考</th><th></th></tr>");
+      for (const obj of infos_list) {
+      var addyear = "<td>" + obj['fields']['year'] + "</td>";
+      var addmonth = "<td>" + obj['fields']['month'] + "</td>";
+      var addmotouke = "<td>" + obj['fields']['motouke'] + "</td>";
+      var addkouzi = "<td>" + obj['fields']['kouzi'] + "</td>";
+      var addplace = "<td>" + obj['fields']['place'] + "</td>";
+      var addcolor_number = "<td>" + obj['fields']['color_number'] + "</td>";
+      var addother = "<td>" + obj['fields']['other'] + "</td>";
+      var url  = "<td><a href='{% url 'informations:edit_info' 123456 %}'>編集</a></td>".replace(/123456/,obj['pk']);
+      $('#table').append("<tr>" + addyear + addmonth + addmotouke + addkouzi + addplace + 
+        addcolor_number + addother + url + "</tr>")
+    }});
+          });
+    </script>
 
 {% endblock content %}
