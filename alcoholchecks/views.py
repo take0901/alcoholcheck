@@ -90,7 +90,6 @@ def delete_info(request, info_id):
 def download_or_delete(request):
     if str(request.user) != "alcohol_admin":
         raise Http404
-    infos = []
     months = sorted(list(Info.objects.values_list("date_added__month", flat=True).distinct()))
     years = sorted(list(Info.objects.values_list("date_added__year", flat=True).distinct()))
     users = list(User.objects.all())
@@ -101,7 +100,6 @@ def download_or_delete(request):
         year = request.POST.get('year')
         months = list(Info.objects.filter(date_added__year=year).values_list(
                                         'date_added__month', flat=True).distinct().order_by())
-        month = months[0]
         infos = Info.objects.filter(date_added__month=month,
                                      date_added__year=year).order_by("date_added")
         
@@ -111,6 +109,7 @@ def download_or_delete(request):
 
             zipname = f"{year}_{month}_data.zip"
             for user in users:
+                infos = infos.filter(owner=user)
                 output = io.BytesIO()
                 filename = "{}_{}_{}_data.xlsx".format(user,year, month)
                 wb = xl.Workbook()
@@ -160,12 +159,5 @@ def download_or_delete(request):
         elif download_or_delete == "delete":
             for info in infos:
                 info.delete()
-        remove_and_insert(months, int(month))
-        remove_and_insert(years, int(year))
-    context = {"months":months, 'years':years, 'infos':infos}
+    context = {"months":months, 'years':years}
     return render(request, 'alcoholchecks/download_or_delete.html', context)
-
-def remove_and_insert(list, index):
-    if index in list:
-        list.remove(index)
-        list.insert(0,index)

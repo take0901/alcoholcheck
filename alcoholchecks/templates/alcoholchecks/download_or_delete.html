@@ -27,17 +27,4 @@
     {% endbuttons %}
   </form>
 
-  {% for info in infos %}
-    <div class="card mb-3">
-        <h4 class="card-header">
-            {{ info.date_added|date:'Y年m月d日 H:i' }}
-        </h4>
-        <div class="card-body">
-            {{ info.alcohol }}  車両ナンバー:{{ info.carnumber }}
-        </div>
-    </div>
-    {% empty %}
-      <p>選択されていません</p>
-    {% endfor %}
-
 {% endblock content %}
