@@ -100,8 +100,6 @@ def download_or_delete(request):
         year = request.POST.get('year')
         months = list(Info.objects.filter(date_added__year=year).values_list(
                                         'date_added__month', flat=True).distinct().order_by())
-        infos = Info.objects.filter(date_added__month=month,
-                                     date_added__year=year).order_by("date_added")
         
         if download_or_delete == "download":
             response = HttpResponse(content_type="application/zip")
@@ -109,7 +107,7 @@ def download_or_delete(request):
 
             zipname = f"{year}_{month}_data.zip"
             for user in users:
-                infos = infos.filter(owner=user)
+                infos = Info.objects.filter(date_added__month=month, date_added__year=year,owner=user)
                 output = io.BytesIO()
                 filename = "{}_{}_{}_data.xlsx".format(user,year, month)
                 wb = xl.Workbook()
