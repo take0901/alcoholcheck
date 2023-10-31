@@ -9,7 +9,9 @@
 
   <p><a href="{% url 'alcoholchecks:infos' user.id %}">{{ user }}</a></p>
 
-  <p>{{ info.alcohol }} {{ info.date_added|date:'Y年m月d日 H:i' }} 車両ナンバー:{{ info.carnumber }}</p>
+  <p>{{ info.alcohol }} {{ info.date_added|date:'Y年m月d日 H:i' }} 車両ナンバー:{{ info.carnumber }}
+     確認者: {{info.varified_by}} {{info.how_to}}
+  </p>
   
   <form action="{% url 'alcoholchecks:delete_info' info.id %}" method="post">
     {% csrf_token %}

@@ -14,7 +14,7 @@
             <small><a href="{% url 'alcoholchecks:delete_info' info.id %}">{{ delete }}</a></small>
         </h4>
         <div class="card-body">
-            {{ info.alcohol }}  車両ナンバー:{{ info.carnumber }}
+            {{ info.alcohol }}  車両ナンバー:{{ info.carnumber }} 確認者: {{info.varified_by}} {{info.how_to}}
         </div>
     </div>
     {% empty %}

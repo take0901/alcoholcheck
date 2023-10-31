@@ -8,12 +8,11 @@ from .forms import InfoForm
 import datetime
 import io
 import openpyxl as xl
-from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.styles.borders import Border, Side
 from openpyxl.styles import Font
 from openpyxl.styles import Alignment
 import zipfile
-from django.http import JsonResponse
+from alcoholcheck.settings import name, name2
 
 def index(request):
     #ホームページ
@@ -48,8 +47,7 @@ def new_info(request, user_id):
     if request.method != 'POST':
         #フォームを生成
         form = InfoForm(initial={'carnumber':user.carnumber, 'alcohol':"アルコール検知: 0.00mg"})
-        form.fields['carnumber'].choices = list(User.objects.values_list("carnumber", 
-                                                            'carnumber').distinct())
+        
     else:
         #POSTで送信されたデータを処理
         form = InfoForm(data=request.POST)
@@ -112,7 +110,7 @@ def download_or_delete(request):
                 filename = "{}_{}_{}_data.xlsx".format(user,year, month)
                 wb = xl.Workbook()
                 sheet = wb.active
-                header = ["日時", "車両ナンバー", "アルコール検知", "確認者"]
+                header = ["日時", "車両ナンバー", "アルコール検知", "確認者", '確認方法']
                 for i, j in enumerate(header):
                     sheet.cell(column=i+1, row=4, value=j)
                 for index,info in enumerate(infos):
@@ -120,7 +118,8 @@ def download_or_delete(request):
                     sheet.cell(row=index+5, column=1, value=info.date_added.strftime('%Y/%m/%d %H:%M'))
                     sheet.cell(row=index+5,column=2, value=int(info.carnumber))
                     sheet.cell(row=index+5, column=3, value=info.alcohol)
-                    sheet.cell(row=index+5, column=4, value="武村義治")
+                    sheet.cell(row=index+5, column=4, value=info.varified_by)
+                    sheet.cell(row=index+5, column=5, value=info.how_to)
                 sheet.title = f"{year}年{month}月"
                 #罫線
                 side = Side(style='thin', color='000000')
