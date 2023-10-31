@@ -12,7 +12,7 @@ from openpyxl.styles.borders import Border, Side
 from openpyxl.styles import Font
 from openpyxl.styles import Alignment
 import zipfile
-from alcoholcheck.settings import name, name2
+from alcoholcheck.settings import name
 
 def index(request):
     #ホームページ
@@ -46,7 +46,8 @@ def new_info(request, user_id):
         
     if request.method != 'POST':
         #フォームを生成
-        form = InfoForm(initial={'carnumber':user.carnumber, 'alcohol':"アルコール検知: 0.00mg"})
+        form = InfoForm(initial={'carnumber':user.carnumber, 'alcohol':"アルコール検知: 0.00mg",
+                                 'varified_by': name, 'how_to': '対面'})
         
     else:
         #POSTで送信されたデータを処理
