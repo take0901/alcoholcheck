@@ -1,6 +1,11 @@
 from django.db import models
 from users.models import User
-from alcoholcheck.settings import name, name2
+import os 
+try:
+    from alcoholcheck.local_settings import *
+except ImportError:
+    name = os.environ['name']
+    name2 = os.environ['name2']
 
 class Info(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
