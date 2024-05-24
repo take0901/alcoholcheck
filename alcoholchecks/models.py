@@ -3,6 +3,7 @@ from users.models import User
 from alcoholcheck.settings import name, name2
 
 class Info(models.Model):
+    a = models.CharField(max_length=20)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     date_added = models.DateTimeField(auto_now_add=True)
     CHOICES = (
