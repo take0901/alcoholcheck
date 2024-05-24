@@ -135,6 +135,8 @@ if not DEBUG:
     import django_heroku
     django_heroku.settings(locals())
     SECRET_KEY = os.environ['SECRET_KEY']
+    name = os.environ['name']
+    name2 = os.environ['name2']
     
 SESSION_COOKIE_AGE = 60 * 15
 AUTH_USER_MODEL = 'users.User'
