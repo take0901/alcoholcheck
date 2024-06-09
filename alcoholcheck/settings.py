@@ -134,7 +134,6 @@ if not DEBUG:
     #Heroku の設定
     import django_heroku
     django_heroku.settings(locals())
-    DEBUG = os.environ.get("DEBUG")
     if os.environ.get('DEBUG') == 'TRUE':
         DEBUG = True
     elif os.environ.get('DEBUG') == "FALSE":
