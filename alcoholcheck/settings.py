@@ -134,6 +134,7 @@ if not DEBUG:
     #Heroku の設定
     import django_heroku
     django_heroku.settings(locals())
+    DEBUG = os.environ.get("DEBUG")
     SECRET_KEY = os.environ['SECRET_KEY']
     name = os.environ['name']
     name2 = os.environ['name2']
