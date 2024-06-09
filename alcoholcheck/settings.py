@@ -135,6 +135,10 @@ if not DEBUG:
     import django_heroku
     django_heroku.settings(locals())
     DEBUG = os.environ.get("DEBUG")
+    if os.environ.get('DEBUG') == 'TRUE':
+        DEBUG = True
+    elif os.environ.get('DEBUG') == "FALSE":
+        DEBUG = False
     SECRET_KEY = os.environ['SECRET_KEY']
     name = os.environ['name']
     name2 = os.environ['name2']
