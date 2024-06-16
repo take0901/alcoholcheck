@@ -24,7 +24,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #SECRET_KEY = "django-insecure-k^9er22-ya2+9@%@^5n&e$p=qf=0)w#&g#c_vmni$+nom3^_9o"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -129,8 +128,6 @@ LOGIN_URL = 'users:login'
 try:
     from .local_settings import *
 except ImportError:
-    pass
-if not DEBUG:
     #Heroku の設定
     import django_heroku
     django_heroku.settings(locals())
