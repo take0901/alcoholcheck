@@ -155,8 +155,8 @@ def download_or_delete(request):
             response['Content-Disposition'] = 'attachment; filename=%s' % zipname
             return response
         elif download_or_delete == "delete":
-            info_all = Info.objects.all()
-            for info in info_all:
+            infos = Info.objects.filter(date_added__year=year, date_added__month=month)
+            for info in infos:
                 info.delete()
     context = {"months":months, 'years':years}
     return render(request, 'alcoholchecks/download_or_delete.html', context)
