@@ -11,6 +11,8 @@ class CustomUserAdmin(DefaultUserAdmin):
     form = CustomUserChangeForm
     add_form = DefaultUserAdmin.add_form
     model = User
+    fieldsets = DefaultUserAdmin.fieldsets
+    fieldsets[0][1]['fields'] += ('carnumber',)
     add_fieldsets = DefaultUserAdmin.add_fieldsets
     add_fieldsets[0][1]['fields'] += ('carnumber',)
  
